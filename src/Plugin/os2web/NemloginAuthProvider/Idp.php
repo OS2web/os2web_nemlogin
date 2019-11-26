@@ -9,7 +9,7 @@ use Drupal\Core\Url;
 use Drupal\os2web_nemlogin\Plugin\AuthProviderBase;
 use GuzzleHttp\Exception\ClientException;
 
-define('OS2WEB_NEMLOGIN_IDP_LOGINSERVICE_PATH', 'adasa/service/loginservice.wsdl');
+define('OS2WEB_NEMLOGIN_IDP_LOGINSERVICE_PATH', '/service/loginservice.wsdl');
 define('OS2WEB_NEMLOGIN_IDP_LOGIN_PATH', '/nemlogin.php');
 define('OS2WEB_NEMLOGIN_IDP_LOGOUT_PATH', '/nemlogout.php');
 define('OS2WEB_NEMLOGIN_IDP_FETCH_ONCE', TRUE);
@@ -284,7 +284,7 @@ class Idp extends AuthProviderBase {
         try {
           $client->get($url);
         }
-        catch (ClientException $e) {
+        catch (\Exception $e) {
           $form_state->setErrorByName('nemlogin_idp_url', $this->t('%url cannot be accessed. Response code: %code', [
             '%url' => $url,
             '%code' => $e->getCode(),
