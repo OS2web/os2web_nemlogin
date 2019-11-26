@@ -66,9 +66,16 @@ class NemloginController extends ControllerBase {
       }
     }
 
-    $build[] = [
-      '#markup' => '<p>' . $authProviderService->generateLink()->toString() . '</p>',
-    ];
+    if ($plugin->isInitialized()) {
+      $build[] = [
+        '#markup' => '<p>' . $authProviderService->generateLink()->toString() . '</p>',
+      ];
+    }
+    else {
+      $build[] = [
+        '#markup' => '<p>' . 'No plugin select, or selected plugin cannot be initialized' . '</p>',
+      ];
+    }
 
     return $build;
   }

@@ -38,7 +38,7 @@ class SimpleSaml extends AuthProviderBase {
       try {
         $this->as = new SimpleSAML_Auth_Simple($this->configuration['nemlogin_simplesaml_default_auth']);
       }
-      catch (Exception $e) {
+      catch (\Exception $e) {
         \Drupal::logger('OS2Web Nemlogin SimpleSAML')
           ->error(t('Cannot initialize simplesaml request: @message', ['@message' => $e->getMessage()]));
       }
