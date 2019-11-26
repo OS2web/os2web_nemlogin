@@ -44,10 +44,6 @@ class SettingsForm extends ConfigFormBase {
     /** @var \Drupal\os2web_nemlogin\Service\AuthProviderService $authProviderService */
     $authProviderService = \Drupal::service('os2web_nemlogin.auth_provider');
 
-    $form[] = [
-      '#markup' => $authProviderService->generateLink()->toString()
-    ];
-
     $header = [
       'title' => $this
         ->t('Title'),
@@ -61,12 +57,12 @@ class SettingsForm extends ConfigFormBase {
     $plugin_definitions = $authProviderPlugins->getDefinitions();
 
     $options = [];
-    foreach ($plugin_definitions as $id => $plugin_defition) {
+    foreach ($plugin_definitions as $id => $plugin_definition) {
       /** @var \Drupal\os2web_nemlogin\Plugin\AuthProviderBase $plugin */
       $plugin = $authProviderPlugins->createInstance($id);
 
-      $options[$plugin_defition['id']] = [
-        'title' => $plugin_defition['label'],
+      $options[$plugin_definition['id']] = [
+        'title' => $plugin_definition['label'],
         'status' => $plugin->isInitialized() ? $this->t('OK') : $this->t('Auth object initialization failed'),
         'action' => Link::createFromRoute('settings', "os2web_nemlogin.auth_provider.$id"),
       ];

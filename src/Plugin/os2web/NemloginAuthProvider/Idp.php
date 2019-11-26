@@ -9,7 +9,7 @@ use Drupal\Core\Url;
 use Drupal\os2web_nemlogin\Plugin\AuthProviderBase;
 use GuzzleHttp\Exception\ClientException;
 
-define('OS2WEB_NEMLOGIN_IDP_LOGINSERVICE_PATH', '/service/loginservice.wsdl');
+define('OS2WEB_NEMLOGIN_IDP_LOGINSERVICE_PATH', 'adasa/service/loginservice.wsdl');
 define('OS2WEB_NEMLOGIN_IDP_LOGIN_PATH', '/nemlogin.php');
 define('OS2WEB_NEMLOGIN_IDP_LOGOUT_PATH', '/nemlogout.php');
 define('OS2WEB_NEMLOGIN_IDP_FETCH_ONCE', TRUE);
@@ -69,7 +69,7 @@ class Idp extends AuthProviderBase {
     try {
       $this->soapClient = new \SoapClient($this->idpUrl . OS2WEB_NEMLOGIN_IDP_LOGINSERVICE_PATH);
     }
-    catch (Exception $e) {
+    catch (\Exception $e) {
       \Drupal::logger('OS2Web Nemlogin IDP')->error(t('Cannot initialize auth SOAP object: @message', ['@message' => $e->getMessage()]));
     }
   }
@@ -122,7 +122,7 @@ class Idp extends AuthProviderBase {
         'mnemo' => $mnemo,
       ]);
     }
-    catch (Exception $e) {
+    catch (\Exception $e) {
       \Drupal::logger('OS2Web Nemlogin IDP')->warning(t('Cannot initialize request: @message', ['@message' => $e->getMessage()]));
     }
 
