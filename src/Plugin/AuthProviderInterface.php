@@ -3,7 +3,6 @@
 namespace Drupal\os2web_nemlogin\Plugin;
 
 use Drupal\Component\Plugin\ConfigurableInterface;
-use Drupal\Component\Plugin\ConfigurablePluginInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
