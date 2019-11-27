@@ -7,7 +7,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Url;
 use Drupal\os2web_nemlogin\Plugin\AuthProviderBase;
-use GuzzleHttp\Exception\ClientException;
 
 define('OS2WEB_NEMLOGIN_IDP_LOGINSERVICE_PATH', '/service/loginservice.wsdl');
 define('OS2WEB_NEMLOGIN_IDP_LOGIN_PATH', '/nemlogin.php');
@@ -131,7 +130,6 @@ class Idp extends AuthProviderBase {
       // to be able use it in a a signup form.
       // This value will be deleted after first usage.
       // @see $this->fetchValue() method.
-
       if (isset($response->LogInResult->cpr)) {
         $cprraw = $response->LogInResult->cpr;
         if ($cprraw) {

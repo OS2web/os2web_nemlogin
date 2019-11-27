@@ -1,3 +1,5 @@
+# OS2Web Nemlogin Drupal module  [![Build Status](https://travis-ci.org/OS2web/os2web_nemlogin.svg?branch=8.x)](https://travis-ci.org/OS2web/os2web_nemlogin)
+
 # Module purpose
 
 The aim of this module is to provide authentication via Nemlogin.

@@ -50,7 +50,7 @@ class SettingsForm extends ConfigFormBase {
       'status' => $this
         ->t('Status'),
       'action' => $this
-        ->t('Actions')
+        ->t('Actions'),
     ];
 
     $authProviderPlugins = \Drupal::service('plugin.manager.os2web_nemlogin.auth_provider');
