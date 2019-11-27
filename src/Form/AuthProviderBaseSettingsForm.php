@@ -91,15 +91,10 @@ class AuthProviderBaseSettingsForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $plugin_id = $this->getPluginIdFromRequest();
     $instance = $this->getPluginInstance($plugin_id);
-    $form = $instance->buildConfigurationForm($form, $form_state);
-    $form['actions'] = ['#type' => 'actions'];
-    $form['actions']['submit'] = [
-      '#type' => 'submit',
-      '#value' => $this->t('Save'),
-      '#button_type' => 'primary',
-    ];
 
-    return $form;
+    $form = $instance->buildConfigurationForm($form, $form_state);
+
+    return parent::buildForm($form, $form_state);
   }
 
   /**
@@ -125,6 +120,8 @@ class AuthProviderBaseSettingsForm extends ConfigFormBase {
     $instanceConfiguration = $instance->getConfiguration();
     $config->set($plugin_id, serialize($instanceConfiguration));
     $config->save();
+
+    parent::submitForm($form, $form_state);
   }
 
 }
