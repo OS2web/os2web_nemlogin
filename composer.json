@@ -4,5 +4,5 @@
     "description": "Provide authentication via Nemlogin",
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "license": "GPL-2.0+"
+    "license": "EUPL-1.2"
 }
