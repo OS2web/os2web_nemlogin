@@ -5,6 +5,8 @@ os2web_nemlogin.login:
     _title: 'Nemlogin login'
   requirements:
     _permission: 'access content'
+  options:
+    no_cache: TRUE
 
 os2web_nemlogin.logout:
   path: '/nemlogin/logout'
@@ -13,6 +15,8 @@ os2web_nemlogin.logout:
     _title: 'Nemlogin logout'
   requirements:
     _permission: 'access content'
+  options:
+    no_cache: TRUE
 
 os2web_nemlogin.settings:
   path: '/admin/config/system/os2web-nemlogin'

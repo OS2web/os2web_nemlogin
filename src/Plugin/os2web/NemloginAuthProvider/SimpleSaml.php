@@ -70,6 +70,28 @@ class SimpleSaml extends AuthProviderBase {
   /**
    * {@inheritdoc}
    */
+  public function isAuthenticatedPerson() {
+    if (!empty($this->fetchValue('cpr'))) {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isAuthenticatedCompany() {
+    if (!empty($this->fetchValue('cvr'))) {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function login() {
     $return_to_url = $this->getReturnUrl();
     if ($this->isInitialized()) {
