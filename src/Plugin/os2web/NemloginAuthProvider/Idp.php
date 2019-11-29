@@ -91,6 +91,32 @@ class Idp extends AuthProviderBase {
   /**
    * {@inheritdoc}
    */
+  public function isAuthenticatedPerson() {
+    // We have to fetch value via parent, in order to avoid possible deletion
+    // of value if "fetchOnce" flag is TRUE.
+    if (!empty(parent::fetchValue('cpr'))) {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isAuthenticatedCompany() {
+    // We have to fetch value via parent, in order to avoid possible deletion
+    // of value if "fetchOnce" flag is TRUE.
+    if (!empty(parent::fetchValue('cvr'))) {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function login() {
     if (empty($_REQUEST['token'])) {
       $forward_url = \Drupal::request()->getSchemeAndHttpHost() . \Drupal::request()->getRequestUri();

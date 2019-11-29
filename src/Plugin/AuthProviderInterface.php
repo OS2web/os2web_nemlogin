@@ -32,6 +32,22 @@ interface AuthProviderInterface extends PluginFormInterface, PluginInspectionInt
   public function isAuthenticated();
 
   /**
+   * Checks if the authenticated entity is person.
+   *
+   * @return bool
+   *   Boolean value about authorization status.
+   */
+  public function isAuthenticatedPerson();
+
+  /**
+   * Checks if the authenticated entity is person.
+   *
+   * @return bool
+   *   Boolean value about authorization status.
+   */
+  public function isAuthenticatedCompany();
+
+  /**
    * Main login method.
    */
   public function login();

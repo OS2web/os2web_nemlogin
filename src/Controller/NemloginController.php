@@ -15,9 +15,6 @@ class NemloginController extends ControllerBase {
    * Nemlogin Auth Provider Login callback.
    */
   public function login() {
-    // Killing cache.
-    \Drupal::service('page_cache_kill_switch')->trigger();
-
     /** @var \Drupal\os2web_nemlogin\Service\AuthProviderService $authProviderService */
     $authProviderService = \Drupal::service('os2web_nemlogin.auth_provider');
 
@@ -30,9 +27,6 @@ class NemloginController extends ControllerBase {
    * Nemlogin Auth Provider Logout callback.
    */
   public function logout() {
-    // Killing cache.
-    \Drupal::service('page_cache_kill_switch')->trigger();
-
     /** @var \Drupal\os2web_nemlogin\Service\AuthProviderService $authProviderService */
     $authProviderService = \Drupal::service('os2web_nemlogin.auth_provider');
 
