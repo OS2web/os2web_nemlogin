@@ -3,7 +3,6 @@
 namespace Drupal\os2web_nemlogin\Plugin;
 
 use Drupal\Component\Plugin\ConfigurableInterface;
-use Drupal\Component\Plugin\ConfigurablePluginInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
@@ -31,6 +30,22 @@ interface AuthProviderInterface extends PluginFormInterface, PluginInspectionInt
    *   Boolean value about authorization status.
    */
   public function isAuthenticated();
+
+  /**
+   * Checks if the authenticated entity is person.
+   *
+   * @return bool
+   *   Boolean value about authorization status.
+   */
+  public function isAuthenticatedPerson();
+
+  /**
+   * Checks if the authenticated entity is person.
+   *
+   * @return bool
+   *   Boolean value about authorization status.
+   */
+  public function isAuthenticatedCompany();
 
   /**
    * Main login method.

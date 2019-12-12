@@ -7,7 +7,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Url;
 use Drupal\os2web_nemlogin\Plugin\AuthProviderBase;
-use GuzzleHttp\Exception\ClientException;
 
 define('OS2WEB_NEMLOGIN_IDP_LOGINSERVICE_PATH', '/service/loginservice.wsdl');
 define('OS2WEB_NEMLOGIN_IDP_LOGIN_PATH', '/nemlogin.php');
@@ -69,7 +68,7 @@ class Idp extends AuthProviderBase {
     try {
       $this->soapClient = new \SoapClient($this->idpUrl . OS2WEB_NEMLOGIN_IDP_LOGINSERVICE_PATH);
     }
-    catch (Exception $e) {
+    catch (\Exception $e) {
       \Drupal::logger('OS2Web Nemlogin IDP')->error(t('Cannot initialize auth SOAP object: @message', ['@message' => $e->getMessage()]));
     }
   }
@@ -87,6 +86,32 @@ class Idp extends AuthProviderBase {
   public function isAuthenticated() {
     // If user has any authenticated data consider it as authenticated.
     return !empty($this->values);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isAuthenticatedPerson() {
+    // We have to fetch value via parent, in order to avoid possible deletion
+    // of value if "fetchOnce" flag is TRUE.
+    if (!empty(parent::fetchValue('cpr'))) {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isAuthenticatedCompany() {
+    // We have to fetch value via parent, in order to avoid possible deletion
+    // of value if "fetchOnce" flag is TRUE.
+    if (!empty(parent::fetchValue('cvr'))) {
+      return TRUE;
+    }
+
+    return FALSE;
   }
 
   /**
@@ -122,7 +147,7 @@ class Idp extends AuthProviderBase {
         'mnemo' => $mnemo,
       ]);
     }
-    catch (Exception $e) {
+    catch (\Exception $e) {
       \Drupal::logger('OS2Web Nemlogin IDP')->warning(t('Cannot initialize request: @message', ['@message' => $e->getMessage()]));
     }
 
@@ -131,7 +156,6 @@ class Idp extends AuthProviderBase {
       // to be able use it in a a signup form.
       // This value will be deleted after first usage.
       // @see $this->fetchValue() method.
-
       if (isset($response->LogInResult->cpr)) {
         $cprraw = $response->LogInResult->cpr;
         if ($cprraw) {
@@ -284,7 +308,7 @@ class Idp extends AuthProviderBase {
         try {
           $client->get($url);
         }
-        catch (ClientException $e) {
+        catch (\Exception $e) {
           $form_state->setErrorByName('nemlogin_idp_url', $this->t('%url cannot be accessed. Response code: %code', [
             '%url' => $url,
             '%code' => $e->getCode(),

@@ -38,7 +38,7 @@ class SimpleSaml extends AuthProviderBase {
       try {
         $this->as = new SimpleSAML_Auth_Simple($this->configuration['nemlogin_simplesaml_default_auth']);
       }
-      catch (Exception $e) {
+      catch (\Exception $e) {
         \Drupal::logger('OS2Web Nemlogin SimpleSAML')
           ->error(t('Cannot initialize simplesaml request: @message', ['@message' => $e->getMessage()]));
       }
@@ -65,6 +65,28 @@ class SimpleSaml extends AuthProviderBase {
     }
 
     return $this->as->isAuthenticated();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isAuthenticatedPerson() {
+    if (!empty($this->fetchValue('cpr'))) {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isAuthenticatedCompany() {
+    if (!empty($this->fetchValue('cvr'))) {
+      return TRUE;
+    }
+
+    return FALSE;
   }
 
   /**
