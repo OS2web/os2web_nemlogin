@@ -129,7 +129,7 @@ class Idp extends AuthProviderBase {
       ]);
       $redirect = new TrustedRedirectResponse($url->toString());
       $redirect->send();
-      return $redirect;
+      die();
     }
 
     $token = $_REQUEST['token'];
@@ -193,7 +193,7 @@ class Idp extends AuthProviderBase {
       \Drupal::logger('OS2Web Nemlogin IDP')->warning(t('Could not fetch CPR / CVR. Response is empty'));
     }
     if (!$pid && $rid) {
-      \Drupal::logger('OS2Web Nemlogin IDP')->warning(t('Could not fetch CPR / CVR. Response is empty'));
+      \Drupal::logger('OS2Web Nemlogin IDP')->warning(t('Could not fetch PID / RID. Response is empty'));
     }
 
     $return_to_url = $this->getReturnUrl();
@@ -207,7 +207,9 @@ class Idp extends AuthProviderBase {
     // Reset all values.
     $this->values = NULL;
 
-    return $this->destroySession($this->getReturnUrl());
+    $logoutResponse = $this->destroySession($this->getReturnUrl());
+    $logoutResponse->send();
+    return $logoutResponse;
   }
 
   /**
@@ -240,7 +242,6 @@ class Idp extends AuthProviderBase {
     $idp = $this->configuration['nemlogin_idp_url'];
     $url = $idp . OS2WEB_NEMLOGIN_IDP_LOGOUT_PATH . '?' . $getParams;
     $redirect = new TrustedRedirectResponse($url);
-    $redirect->send();
     return $redirect;
   }
 
