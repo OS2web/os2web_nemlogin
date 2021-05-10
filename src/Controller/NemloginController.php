@@ -58,6 +58,12 @@ class NemloginController extends ControllerBase {
           '#markup' => '<p>' . 'You are logged in with CVR: ' . $cvr . '</p>',
         ];
       }
+
+      if (!$cpr && !$cvr) {
+        $build[] = [
+          '#markup' => '<p>' . 'You are logged, but neither CPR nor CVR available</p>',
+        ];
+      }
     }
 
     if ($plugin->isInitialized()) {

@@ -5,8 +5,8 @@ namespace Drupal\os2web_nemlogin\Plugin\os2web\NemloginAuthProvider;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\os2web_nemlogin\Plugin\AuthProviderBase;
+use SimpleSAML\Auth\Simple;
 
-define('OS2WEB_NEMLOGIN_SIMPLESAML_INSTALLDIR', '/var/simplesaml');
 define('OS2WEB_NEMLOGIN_SIMPLESAML_AUTH_METHOD', 'default-sp');
 
 /**
@@ -32,20 +32,12 @@ class SimpleSaml extends AuthProviderBase {
   public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
-    $simplesaml_installdir = $this->configuration['nemlogin_simplesaml_installdir'];
-    if (file_exists($simplesaml_installdir . '/lib/_autoload.php')) {
-      require_once $simplesaml_installdir . '/lib/_autoload.php';
-      try {
-        $this->as = new SimpleSAML_Auth_Simple($this->configuration['nemlogin_simplesaml_default_auth']);
-      }
-      catch (\Exception $e) {
-        \Drupal::logger('OS2Web Nemlogin SimpleSAML')
-          ->error(t('Cannot initialize simplesaml request: @message', ['@message' => $e->getMessage()]));
-      }
+    try {
+      $this->as = new Simple($this->configuration['nemlogin_simplesaml_default_auth']);
     }
-    else {
+    catch (\Exception $e) {
       \Drupal::logger('OS2Web Nemlogin SimpleSAML')
-        ->warning(t('Simplesaml installtion not found'));
+        ->error(t('Cannot initialize simplesaml request: @message', ['@message' => $e->getMessage()]));
     }
   }
 
@@ -53,7 +45,18 @@ class SimpleSaml extends AuthProviderBase {
    * {@inheritdoc}
    */
   public function isInitialized() {
-    return $this->as instanceof SimpleSAML_Auth_Simple;
+    if ($initialized = $this->as instanceof Simple) {
+      try {
+        $this->as->getAuthSource();
+      }
+      catch (\Exception $e) {
+        \Drupal::logger('OS2Web Nemlogin SimpleSAML')
+          ->error(t('Cannot initialize simplesaml request: @message', ['@message' => $e->getMessage()]));
+        $initialized = FALSE;
+      }
+    }
+
+    return $initialized;
   }
 
   /**
@@ -155,7 +158,6 @@ class SimpleSaml extends AuthProviderBase {
    */
   public function defaultConfiguration() {
     return parent::defaultConfiguration() + [
-      'nemlogin_simplesaml_installdir' => OS2WEB_NEMLOGIN_SIMPLESAML_INSTALLDIR,
       'nemlogin_simplesaml_default_auth' => OS2WEB_NEMLOGIN_SIMPLESAML_AUTH_METHOD,
     ];
   }
@@ -164,14 +166,6 @@ class SimpleSaml extends AuthProviderBase {
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $form['nemlogin_simplesaml_installdir'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Full path to simplesaml installation'),
-      '#description' => $this->t('Absolute path to simplesaml installation. Example: /var/simplesaml'),
-      '#default_value' => $this->configuration['nemlogin_simplesaml_installdir'],
-      '#required' => TRUE,
-    ];
-
     $form['nemlogin_simplesaml_default_auth'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Simplesaml default auth method'),
@@ -186,20 +180,9 @@ class SimpleSaml extends AuthProviderBase {
   /**
    * {@inheritdoc}
    */
-  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
-    $nemlogin_simplesaml_installdir = $form_state->getValue('nemlogin_simplesaml_installdir');
-    if (!file_exists($nemlogin_simplesaml_installdir)) {
-      $form_state->setErrorByName('nemlogin_simplesaml_installdir', $this->t("Path %path doesn't exist", ['%path' => $nemlogin_simplesaml_installdir]));
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     $configuration = $this->getConfiguration();
 
-    $configuration['nemlogin_simplesaml_installdir'] = $form_state->getValue('nemlogin_simplesaml_installdir');
     $configuration['nemlogin_simplesaml_default_auth'] = $form_state->getValue('nemlogin_simplesaml_default_auth');
 
     $this->setConfiguration($configuration);
