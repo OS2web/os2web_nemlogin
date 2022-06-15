@@ -196,6 +196,8 @@ class Idp extends AuthProviderBase {
       \Drupal::logger('OS2Web Nemlogin IDP')->warning(t('Could not fetch PID / RID. Response is empty'));
     }
 
+    \Drupal::logger('OS2Web Nemlogin IDP')->debug('Response values: ' . print_r((array) $response, 1));
+    
     $return_to_url = $this->getReturnUrl();
     return $this->destroySession($return_to_url);
   }
