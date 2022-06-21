@@ -94,8 +94,9 @@ class Idp extends AuthProviderBase {
   public function isAuthenticatedPerson() {
     // We have to fetch value via parent, in order to avoid possible deletion
     // of value if "fetchOnce" flag is TRUE.
-    if (!empty(parent::fetchValue('cpr'))) {
-      return TRUE;
+    // It's important that CVR key is empty. There could be both keys in case of
+    // using key files.
+    if (!empty(parent::fetchValue('cpr')) && empty(parent::fetchValue('cvr'))) {
     }
 
     return FALSE;
