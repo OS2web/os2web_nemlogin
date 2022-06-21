@@ -97,6 +97,7 @@ class Idp extends AuthProviderBase {
     // It's important that CVR key is empty. There could be both keys in case of
     // using key files.
     if (!empty(parent::fetchValue('cpr')) && empty(parent::fetchValue('cvr'))) {
+      return TRUE;
     }
 
     return FALSE;
