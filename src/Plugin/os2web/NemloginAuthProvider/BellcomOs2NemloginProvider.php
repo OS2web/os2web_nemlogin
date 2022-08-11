@@ -92,7 +92,7 @@ class BellcomOs2NemloginProvider extends AuthProviderBase {
     // Testing if we have access to all URLs.
     foreach ($url_to_test as $url) {
       try {
-        if ($this->httpClient->get($url)->getStatusCode() !== 200) {
+        if (!$this->httpClient || $this->httpClient->get($url)->getStatusCode() !== 200) {
           return FALSE;
         }
       }
