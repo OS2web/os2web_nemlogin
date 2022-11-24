@@ -219,6 +219,13 @@ class BellcomOs2NemloginProvider extends AuthProviderBase {
       }
     }
 
+    $request = \Drupal::request();
+    $session = $request->getSession();
+
+    /** @var \Drupal\Core\TempStore\SharedTempStore $store */
+    $store = \Drupal::service('tempstore.shared')->get('os2web_nemlogin.session_tokens');
+    $store->set($token, $session->getId());
+
     if (!$cpr && !$cvr) {
       \Drupal::logger('OS2Web Nemlogin Bellcom OS2')->warning(t('Could not fetch CPR / CVR. Response is empty'));
     }
