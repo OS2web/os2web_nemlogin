@@ -40,24 +40,25 @@ class NemloginController extends ControllerBase {
   /**
    * Nemlogin session destroy
    *
-   * @param $token
-   *  Token to find session by.
-   *
    * @return \Symfony\Component\HttpFoundation\Response
    * @throws \Drupal\Core\TempStore\TempStoreException
    */
-  public function destroySessionByToken($token) {
-    // Find session id.
-    /** @var \Drupal\Core\TempStore\SharedTempStore $store */
-    $store = \Drupal::service('tempstore.shared')->get('os2web_nemlogin.session_tokens');
-    $sid = $store->get($token);
+  public function destroySessionByToken() {
+    $token = $_POST['token'];
 
-    if ($sid) {
-      /** @var \Drupal\Core\Session\SessionHandler $sessionHandler */
-      $sessionHandler = \Drupal::service('session_handler');
-      $sessionHandler->destroy($sid);
+    if ($token) {
+      // Find session id.
+      /** @var \Drupal\Core\TempStore\SharedTempStore $store */
+      $store = \Drupal::service('tempstore.shared')->get('os2web_nemlogin.session_tokens');
+      $sid = $store->get($token);
 
-      $store->delete($token);
+      if ($sid) {
+        /** @var \Drupal\Core\Session\SessionHandler $sessionHandler */
+        $sessionHandler = \Drupal::service('session_handler');
+        $sessionHandler->destroy($sid);
+
+        $store->delete($token);
+      }
     }
 
     return new Response();

@@ -19,7 +19,7 @@ os2web_nemlogin.logout:
     no_cache: TRUE
 
 os2web_nemlogin.session_destroy:
-  path: '/nemlogin/session-destroy/{token}'
+  path: '/nemlogin/session-destroy'
   defaults:
     _controller: '\Drupal\os2web_nemlogin\Controller\NemloginController::destroySessionByToken'
     _title: 'Session destroy'
