@@ -46,10 +46,56 @@ class AuthProviderService {
    *
    * @return \Drupal\os2web_nemlogin\Plugin\AuthProviderInterface
    *   Plugin object.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   public function getActivePlugin() {
-    $authProviderPlugins = \Drupal::service('plugin.manager.os2web_nemlogin.auth_provider');
-    return $authProviderPlugins->createInstance($this->getActivePluginId());
+    return $this->getPluginInstance($this->getActivePluginId());
+  }
+
+  /**
+   * Returns Plugin instance.
+   *
+   * @param string $plugin_id
+   *   String id of the plugin.
+   *
+   * @return \Drupal\os2web_nemlogin\Plugin\AuthProviderInterface
+   *   Plugin object.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   */
+  public function getPluginInstance($plugin_id) {
+    /** @var \Drupal\os2web_nemlogin\Plugin\AuthProviderManager $authProviderManager */
+    $authProviderManager = \Drupal::service('plugin.manager.os2web_nemlogin.auth_provider');
+
+    /** @var \Drupal\os2web_nemlogin\Plugin\AuthProviderInterface $pluginInstance */
+    $pluginInstance = $authProviderManager->createInstance($plugin_id);
+
+    return $pluginInstance;
+  }
+
+  /**
+   * Returns a list of initialized plugin.
+   *
+   * @return array
+   *   Mapped as ["plugin_id" => "Plugin name"]
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   */
+  public function getInitializedPlugins() {
+    /** @var \Drupal\os2web_nemlogin\Plugin\AuthProviderManager $authProviderManager */
+    $authProviderManager = \Drupal::service('plugin.manager.os2web_nemlogin.auth_provider');
+    $definitions = $authProviderManager->getDefinitions();
+    $initializedPlugins = [];
+    foreach ($definitions as $definition) {
+      /** @var \Drupal\os2web_nemlogin\Plugin\AuthProviderInterface $plugin */
+      $plugin = $authProviderManager->createInstance($definition['id']);
+      if ($plugin->isInitialized()) {
+        $initializedPlugins[$definition['id']] = $definition['label'];
+      }
+    }
+
+    return $initializedPlugins;
   }
 
   /**
@@ -57,11 +103,13 @@ class AuthProviderService {
    *
    * @param array $options
    *   Array of options, @see \Drupal\Core\Url::fromUri().
+   * @param string $plugin_id
+   *   Plugin id, if omitted using default.
    *
    * @return \Drupal\Core\Url
    *   The generate URL.
    */
-  public function getLoginUrl(array $options = []) {
+  public function getLoginUrl(array $options = [], $plugin_id = NULL) {
     $options += ['absolute' => TRUE];
 
     if (empty($options['query']['destination'])) {
@@ -69,7 +117,7 @@ class AuthProviderService {
       $options['query']['destination'] = ltrim($requestUri, '/');
     }
 
-    $url = Url::fromRoute('os2web_nemlogin.login', [], $options);
+    $url = Url::fromRoute('os2web_nemlogin.login', ['plugin_id' => $plugin_id], $options);
 
     return $url;
   }
@@ -79,11 +127,13 @@ class AuthProviderService {
    *
    * @param array $options
    *   Array of options, @see \Drupal\Core\Url::fromUri().
+   * @param string $plugin_id
+   *   Plugin id, if omitted using default.
    *
    * @return \Drupal\Core\Url
    *   The generate URL.
    */
-  public function getLogoutUrl(array $options = []) {
+  public function getLogoutUrl(array $options = [], $plugin_id = NULL) {
     $options += ['absolute' => TRUE];
 
     if (empty($options['query']['destination'])) {
@@ -91,7 +141,7 @@ class AuthProviderService {
       $options['query']['destination'] = ltrim($requestUri, '/');
     }
 
-    $url = Url::fromRoute('os2web_nemlogin.logout', [], $options);
+    $url = Url::fromRoute('os2web_nemlogin.logout', ['plugin_id' => $plugin_id], $options);
 
     return $url;
   }
@@ -105,28 +155,38 @@ class AuthProviderService {
    *   Logout link text.
    * @param array $options
    *   Array of options, @see \Drupal\Core\Url::fromUri().
+   * @param string $plugin_id
+   *   Plugin id, if omitted using default.
    *
    * @return string
    *   Generated URL.
    */
-  public function generateLink($login_text = NULL, $logout_text = NULL, array $options = []) {
+  public function generateLink($login_text = NULL, $logout_text = NULL, array $options = [], $plugin_id = NULL) {
     $login_text = isset($login_text) ? $login_text : t('Login with Nemlogin');
     $logout_text = isset($logout_text) ? $logout_text : t('Logout with Nemlogin');
 
-    $plugin = $this->getActivePlugin();
-    if (empty($plugin)) {
+    $plugin = NULL;
+    try {
+      if ($plugin_id) {
+        $plugin = $this->getPluginInstance($plugin_id);
+      }
+      else {
+        $plugin = $this->getActivePlugin();
+      }
+    }
+    catch (\Exception $e) {
       \Drupal::logger('OS2Web Nemlogin')->warning(t('Nemlogin authorization object is empty'));
       return NULL;
     }
 
-    if (!$plugin->isInitialized()) {
+    if (empty($plugin) || !$plugin->isInitialized()) {
       \Drupal::logger('OS2Web Nemlogin')->warning(t("Nemlogin authorization object doesn't work properly"));
       return NULL;
     }
 
     return $plugin->isAuthenticated()
-      ? Link::fromTextAndUrl($logout_text, $this->getLogoutUrl($options))
-      : Link::fromTextAndUrl($login_text, $this->getLoginUrl($options));
+      ? Link::fromTextAndUrl($logout_text, $this->getLogoutUrl($options, $plugin_id))
+      : Link::fromTextAndUrl($login_text, $this->getLoginUrl($options, $plugin_id));
   }
 
 }

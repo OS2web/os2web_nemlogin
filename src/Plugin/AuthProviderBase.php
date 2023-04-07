@@ -2,6 +2,7 @@
 
 namespace Drupal\os2web_nemlogin\Plugin;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\os2web_nemlogin\Form\AuthProviderBaseSettingsForm;
@@ -65,7 +66,19 @@ abstract class AuthProviderBase extends PluginBase implements AuthProviderInterf
    * {@inheritdoc}
    */
   public function fetchValue($key) {
-    return isset($this->values[$key]) ? $this->values[$key] : NULL;
+    if (is_array($key)) {
+      return NestedArray::getValue($this->values, $key);
+    }
+    else {
+      return isset($this->values[$key]) ? $this->values[$key] : NULL;
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function fetchAllValues() {
+    return $this->values;
   }
 
   /**
