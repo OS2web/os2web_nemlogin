@@ -49,23 +49,38 @@ interface AuthProviderInterface extends PluginFormInterface, PluginInspectionInt
 
   /**
    * Main login method.
+   *
+   * @return \Drupal\Core\Routing\TrustedRedirectResponse
+   *   Redirect response.
    */
   public function login();
 
   /**
    * Main logout method.
+   *
+   * @return \Drupal\Core\Routing\TrustedRedirectResponse
+   *   Redirect response.
    */
   public function logout();
 
   /**
    * Fetch authorization value by key.
    *
-   * @param string $key
+   * @param string|array $key
    *   Key for fetching value.
+   *   If array is used, performing NestedArray::getValue() lookup.
    *
    * @return string
    *   Authorization value.
    */
   public function fetchValue($key);
+
+  /**
+   * Fetches all authorization values with key.
+   *
+   * @return array
+   *   Authorization values array.
+   */
+  public function fetchAllValues();
 
 }
