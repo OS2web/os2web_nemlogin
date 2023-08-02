@@ -84,6 +84,13 @@ abstract class AuthProviderBase extends PluginBase implements AuthProviderInterf
   /**
    * {@inheritdoc}
    */
+  public function clearValues() {
+    $this->values = [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function defaultConfiguration() {
     return [
       'plugin_id' => $this->pluginId,

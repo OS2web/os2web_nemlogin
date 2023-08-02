@@ -83,4 +83,9 @@ interface AuthProviderInterface extends PluginFormInterface, PluginInspectionInt
    */
   public function fetchAllValues();
 
+  /**
+   * Removes all values so that they cannot be used in the future requests.
+   */
+  public function clearValues();
+
 }
