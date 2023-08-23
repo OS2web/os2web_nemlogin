@@ -4,6 +4,7 @@ namespace Drupal\os2web_nemlogin\Plugin\os2web\NemloginAuthProvider;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\TrustedRedirectResponse;
+use Drupal\Core\Site\Settings;
 use Drupal\os2web_nemlogin\Plugin\AuthProviderBase;
 use SimpleSAML\Auth\Simple;
 
@@ -33,6 +34,10 @@ class SimpleSaml extends AuthProviderBase {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     try {
+      if ($dir = Settings::get('simplesamlphp_dir')) {
+        include_once $dir . '/lib/_autoload.php';
+      }
+
       $this->as = new Simple($this->configuration['nemlogin_simplesaml_default_auth']);
     }
     catch (\Exception $e) {
