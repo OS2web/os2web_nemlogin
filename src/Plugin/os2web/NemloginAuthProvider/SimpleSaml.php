@@ -8,8 +8,6 @@ use Drupal\Core\Site\Settings;
 use Drupal\os2web_nemlogin\Plugin\AuthProviderBase;
 use SimpleSAML\Auth\Simple;
 
-define('OS2WEB_NEMLOGIN_SIMPLESAML_AUTH_METHOD', 'default-sp');
-
 /**
  * Defines a plugin for Nemlogin auth via SimpleSAML.
  *
@@ -21,9 +19,24 @@ define('OS2WEB_NEMLOGIN_SIMPLESAML_AUTH_METHOD', 'default-sp');
 class SimpleSaml extends AuthProviderBase {
 
   /**
-   * Authorization values array.
+   * Default SP.
+   */
+  const DEFAULT_SP = 'default-sp';
+
+  /**
+   * Spec version: DK-SAML-2.0.
+   */
+  const SPEC_VERSION_DK_SAML_2_0 = 'DK-SAML-2.0';
+
+  /**
+   * Spec version: OIO-SAML-3.0.
+   */
+  const SPEC_VERSION_OIO_SAML_3_0 = 'OIO-SAML-3.0';
+
+  /**
+   * SimpleSAML object.
    *
-   * @var SimpleSAML_Auth_Simple
+   * @var \SimpleSAML\Auth\Simple
    */
   private $as;
 
@@ -142,16 +155,24 @@ class SimpleSaml extends AuthProviderBase {
       return NULL;
     }
 
-    // Make first char uppercase and suffixing with NumberIdentifier.
-    $key = ucfirst(strtolower($key));
-    $key .= 'NumberIdentifier';
+    $configuration = $this->getConfiguration();
+
+    if ($configuration['nemlogin_simplesaml_spec_version'] == self::SPEC_VERSION_DK_SAML_2_0) {
+      // Make first char uppercase and suffixing with NumberIdentifier.
+      // Expected key = dk:gov:saml:attribute:CprNumberIdentifier.
+      $key = 'dk:gov:saml:attribute:' . ucfirst(strtolower($key)) . 'NumberIdentifier';
+    }
+    elseif ($configuration['nemlogin_simplesaml_spec_version'] == self::SPEC_VERSION_OIO_SAML_3_0) {
+      // Expected key = https://data.gov.dk/model/core/eid/cprNumber.
+      $key = 'https://data.gov.dk/model/core/eid/' . strtolower($key) . 'Number';
+    }
 
     $attrs = $this->as->getAttributes();
     $value = NULL;
 
-    if (is_array($attrs) && isset($attrs["dk:gov:saml:attribute:$key"])) {
-      if (is_array($attrs["dk:gov:saml:attribute:$key"]) && isset($attrs["dk:gov:saml:attribute:$key"][0])) {
-        $value = $attrs["dk:gov:saml:attribute:$key"][0];
+    if (is_array($attrs) && isset($attrs[$key])) {
+      if (is_array($attrs[$key]) && isset($attrs[$key][0])) {
+        $value = $attrs[$key][0];
       }
     }
 
@@ -161,9 +182,17 @@ class SimpleSaml extends AuthProviderBase {
   /**
    * {@inheritdoc}
    */
+  public function fetchAllValues() {
+    return $this->as->getAttributes();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function defaultConfiguration() {
     return parent::defaultConfiguration() + [
-      'nemlogin_simplesaml_default_auth' => OS2WEB_NEMLOGIN_SIMPLESAML_AUTH_METHOD,
+      'nemlogin_simplesaml_default_auth' => self::DEFAULT_SP,
+      'nemlogin_simplesaml_spec_version' => self::SPEC_VERSION_DK_SAML_2_0,
     ];
   }
 
@@ -173,9 +202,21 @@ class SimpleSaml extends AuthProviderBase {
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form['nemlogin_simplesaml_default_auth'] = [
       '#type' => 'textfield',
-      '#title' => $this->t('Simplesaml default auth method'),
-      '#description' => $this->t('Default auth method for simplesaml. Example: default-sp'),
+      '#title' => $this->t('SimpleSAML default auth method'),
+      '#description' => $this->t('Default auth method for SimpleSAML. Example: default-sp'),
       '#default_value' => $this->configuration['nemlogin_simplesaml_default_auth'],
+      '#required' => TRUE,
+    ];
+
+    $form['nemlogin_simplesaml_spec_version'] = [
+      '#type' => 'select',
+      '#title' => $this->t('SimpleSAML Spec Version'),
+      '#options' => [
+        self::SPEC_VERSION_DK_SAML_2_0 => 'Default (DK-SAML-2.0)',
+        self::SPEC_VERSION_OIO_SAML_3_0 => 'OS2faktor (OIO-SAML-3.0)',
+      ],
+      '#description' => $this->t('SimpleSAML specification version'),
+      '#default_value' => $this->configuration['nemlogin_simplesaml_spec_version'],
       '#required' => TRUE,
     ];
 
@@ -189,6 +230,7 @@ class SimpleSaml extends AuthProviderBase {
     $configuration = $this->getConfiguration();
 
     $configuration['nemlogin_simplesaml_default_auth'] = $form_state->getValue('nemlogin_simplesaml_default_auth');
+    $configuration['nemlogin_simplesaml_spec_version'] = $form_state->getValue('nemlogin_simplesaml_spec_version');
 
     $this->setConfiguration($configuration);
   }
