@@ -7,6 +7,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Url;
 use Drupal\os2web_nemlogin\Plugin\AuthProviderBase;
+use GuzzleHttp\Exception\ServerException;
 
 define('OS2WEB_NEMLOGIN_BEL_OS2_REST_PATH', '/service/LoginService.php');
 define('OS2WEB_NEMLOGIN_BEL_OS2_LOGIN_PATH', '/nemlogin.php');
@@ -74,7 +75,12 @@ class BellcomOs2NemloginProvider extends AuthProviderBase {
 
     // Testing if we have access to all URLs.
     foreach ($url_to_test as $url) {
-      if ($this->httpClient->get($url)->getStatusCode() !== 200) {
+      try {
+        if ($this->httpClient->get($url)->getStatusCode() !== 200) {
+          \Drupal::logger('OS2Web Nemlogin Bellcom OS2')->error(t('One of the URL\'s is not available: @url', ['@url' => $url]));
+        }
+      }
+      catch (ServerException $e) {
         \Drupal::logger('OS2Web Nemlogin Bellcom OS2')->error(t('One of the URL\'s is not available: @url', ['@url' => $url]));
       }
     }
