@@ -1,0 +1,7 @@
+name: OS2web nemlogin Automated Logout
+type: module
+description: 'OS2web Nemlogin autologout'
+core_version_requirement: ^9.2 || ^10
+configure: os2web_nemlogin_autologout.set_admin
+dependencies:
+  - 'drupal:os2web_nemlogin'

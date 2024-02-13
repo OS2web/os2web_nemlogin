@@ -65,6 +65,11 @@ class BellcomOs2NemloginProvider extends AuthProviderBase {
     }
     $this->values = &$_SESSION['nemlogin_idp'];
 
+    if (!isset($_SESSION['nemlogin_idp_init'])) {
+      $_SESSION['nemlogin_idp_init'] = 0;
+    }
+    $this->sessionInitialized = &$_SESSION['nemlogin_idp_init'];
+
     // Init authentication object.
     $this->httpClient = \Drupal::httpClient();
 
@@ -223,6 +228,8 @@ class BellcomOs2NemloginProvider extends AuthProviderBase {
           $this->values['rid'] = $rid;
         }
       }
+
+      $this->resetSessionInitialized();
     }
 
     if (!$cpr && !$cvr) {
@@ -232,8 +239,9 @@ class BellcomOs2NemloginProvider extends AuthProviderBase {
       \Drupal::logger('OS2Web Nemlogin Bellcom OS2')->warning(t('Could not fetch PID / RID. Response is empty'));
     }
 
-    $return_to_url = $this->getReturnUrl();
-    return $this->destroySession($return_to_url);
+    $logoutResponse = $this->getDestroySessionRedirect($this->getReturnUrl());
+    $logoutResponse->send();
+    return $logoutResponse;
   }
 
   /**
@@ -241,9 +249,9 @@ class BellcomOs2NemloginProvider extends AuthProviderBase {
    */
   public function logout() {
     // Reset all values.
-    $this->values = NULL;
+    $this->clearValues();
 
-    $logoutResponse = $this->destroySession($this->getReturnUrl());
+    $logoutResponse = $this->getDestroySessionRedirect($this->getReturnUrl());
     $logoutResponse->send();
     return $logoutResponse;
   }
@@ -269,7 +277,7 @@ class BellcomOs2NemloginProvider extends AuthProviderBase {
    * @return \Drupal\Core\Routing\TrustedRedirectResponse
    *   Redirect response.
    */
-  private function destroySession($callback) {
+  private function getDestroySessionRedirect($callback) {
     $getParams = http_build_query(
       [
         'RelayState' => $callback,

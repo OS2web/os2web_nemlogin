@@ -1,0 +1,6 @@
+os2web_nemlogin_autologout.set_admin:
+  title: 'OS2Web Nemlogin autologout logout settings'
+  parent: user.admin_index
+  description: 'Configure default automated logout settings for os2web_nemlogin_autologout.'
+  weight: -10
+  route_name: os2web_nemlogin_autologout.set_admin

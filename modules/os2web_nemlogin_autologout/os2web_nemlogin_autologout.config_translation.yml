@@ -1,0 +1,5 @@
+os2web_nemlogin_autologout.config:
+  title: 'Autologout'
+  base_route_name: os2web_nemlogin_autologout.set_admin
+  names:
+    - os2web_nemlogin_autologout.settings

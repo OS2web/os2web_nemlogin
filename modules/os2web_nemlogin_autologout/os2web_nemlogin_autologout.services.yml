@@ -1,0 +1,12 @@
+services:
+  os2web_nemlogin_autologout_event_subscriber:
+    class: Drupal\os2web_nemlogin_autologout\EventSubscriber\AutologoutSubscriber
+    tags:
+      - {name: event_subscriber}
+    arguments: ['@os2web_nemlogin_autologout.manager', '@current_user', '@config.factory','@theme.manager','@datetime.time', '@request_stack', '@language_manager', '@os2web_nemlogin.auth_provider']
+
+  os2web_nemlogin_autologout.manager:
+    class: Drupal\os2web_nemlogin_autologout\AutologoutManager
+    tags:
+      - {name: os2web_nemlogin_autologout_manager}
+    arguments: ['@module_handler', '@config.factory', '@messenger', '@datetime.time', '@os2web_nemlogin.auth_provider']

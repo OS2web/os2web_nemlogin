@@ -1,0 +1,119 @@
+<?php
+
+/**
+ * @file
+ * Automated Logout - Module.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Component\Utility\Xss;
+
+/**
+ * Implements hook_os2web_nemlogin_autologout_prevent().
+ */
+function os2web_nemlogin_autologout_os2web_nemlogin_autologout_prevent() {
+  $user_ip = \Drupal::request()->getClientIp();
+
+  // Don't include autologout JS checks on ajax callbacks.
+  $paths = [
+    'system',
+    'os2web_nemlogin_autologout_ajax_get_time_left',
+    'os2web_nemlogin_autologout_ajax_logout',
+    'os2web_nemlogin_autologout_ajax_set_last',
+  ];
+  // getPath is used because Url::fromRoute('<current>')->toString() doesn't
+  // give correct path for XHR request.
+  $url = \Drupal::service('path.current')->getPath();
+  $path_args = explode('/', $url);
+
+  if (in_array($path_args[1], $paths)) {
+    return TRUE;
+  }
+
+  // If user has no timeout set.
+  if (\Drupal::service('os2web_nemlogin_autologout.manager')->getUserTimeout() === 0) {
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+/**
+ * Implements hook_page_attachments().
+ *
+ * Add a form element to every page which is used to detect if the page was
+ * loaded from browser cache. This happens when the browser's back button is
+ * pressed for example. The JS will set the value of the hidden input element
+ * to 1 after initial load. If this is 1 on subsequent loads, the page was
+ * loaded from cache and an autologout timeout refresh needs to be triggered.
+ */
+function os2web_nemlogin_autologout_page_attachments_alter(array &$attachments) {
+  $autologout_manager = \Drupal::service('os2web_nemlogin_autologout.manager');
+
+  // Check if JS should be included on this request.
+  if ($autologout_manager->preventJs()) {
+    return;
+  }
+
+  $settings = \Drupal::config('os2web_nemlogin_autologout.settings');
+
+  // Get all settings JS will need for dialog.
+  $timeout = $autologout_manager->getUserTimeout();
+  $timeout_padding = $settings->get('padding');
+  $no_dialog = $settings->get('no_dialog');
+  $disable_buttons = $settings->get('disable_buttons');
+  $yes_button = $settings->get('yes_button');
+  if (empty($yes_button)) {
+    $yes_button = t('Yes');
+  }
+  $no_button = $settings->get('no_button');
+  if (empty($no_button)) {
+    $no_button = t('No');
+  }
+  $title = $settings->get('dialog_title');
+  if (!$title) {
+    $title = \Drupal::config('system.site')->get('name') . ' Alert';
+  }
+  // phpcs:ignore
+  $msg = t(Xss::filter($settings->get('message')));
+
+  $settings = [
+    'timeout' => $timeout * 1000,
+    'timeout_padding' => $timeout_padding * 1000,
+    'message' => $msg,
+    // phpcs:ignore
+    'title' => t($title),
+    'no_dialog' => $no_dialog,
+    'disable_buttons' => $disable_buttons,
+    'yes_button' => $yes_button,
+    'no_button' => $no_button,
+    'modal_width' => $settings->get('modal_width') ? (int) $settings->get('modal_width') : 'auto',
+  ];
+
+  os2web_nemlogin_autologout_attach_js($attachments, $settings);
+}
+
+/**
+ * Implements hook_page_bottom().
+ */
+function os2web_nemlogin_autologout_page_bottom(array &$page_bottom) {
+  if (!\Drupal::service('os2web_nemlogin_autologout.manager')->preventJs()) {
+    $page_bottom['os2web_nemlogin_autologout'] = [
+      '#markup' => '<form id="os2web-nemlogin-autologout-cache-check"><input type="hidden" id="os2web-nemlogin-autologout-cache-check-bit" value="0" /></form>',
+    ];
+  }
+}
+
+/**
+ * Adds the necessary js and libraries.
+ *
+ * @param array $element
+ *   The renderable array element to #attach the js to.
+ * @param array $settings
+ *   The JS Settings.
+ */
+function os2web_nemlogin_autologout_attach_js(array &$element, array $settings) {
+  $element['#attached']['drupalSettings']['os2web_nemlogin_autologout'] = $settings;
+  $element['#attached']['library'][] = 'os2web_nemlogin_autologout/drupal.os2web_nemlogin_autologout';
+  $element['#cache']['tags'][] = 'config:os2web_nemlogin_autologout.settings';
+}

@@ -1,0 +1,45 @@
+os2web_nemlogin_autologout.settings:
+  type: config_object
+  mapping:
+    enabled:
+      type: boolean
+      label: 'Enable autologout'
+    timeout:
+      type: integer
+      label: 'Timeout value'
+    padding:
+      type: integer
+      label: 'Seconds to give a user to respond'
+    no_dialog:
+      type: boolean
+      label: 'Integer label'
+    message:
+      type: text
+      label: 'Message to display'
+    inactivity_message:
+      type: text
+      label: 'Message displayed after logging out'
+    inactivity_message_type:
+      type: string
+      label: 'Type of the message displayed'
+    modal_width:
+      type: integer
+      label: 'Modal width'
+    jstimer_format:
+      type: string
+      label: 'JS timer format'
+    jstimer_js_load_option:
+      type: boolean
+      label: 'JS timer load'
+    dialog_title:
+      type: label
+      label: 'Title'
+    disable_buttons:
+      type: boolean
+      label: 'Disable buttons'
+    yes_button:
+      type: label
+      label: 'Yes button text'
+    no_button:
+      type: label
+      label: 'No button text'

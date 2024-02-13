@@ -20,6 +20,13 @@ abstract class AuthProviderBase extends PluginBase implements AuthProviderInterf
   protected $values;
 
   /**
+   * Timestamp when session was initialized (created or updated).
+   *
+   * @var int
+   */
+  protected $sessionInitialized;
+
+  /**
    * {@inheritdoc}
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition) {
@@ -86,6 +93,7 @@ abstract class AuthProviderBase extends PluginBase implements AuthProviderInterf
    */
   public function clearValues() {
     $this->values = [];
+    $this->sessionInitialized = 0;
   }
 
   /**
@@ -109,6 +117,20 @@ abstract class AuthProviderBase extends PluginBase implements AuthProviderInterf
    */
   public function setConfiguration(array $configuration) {
     $this->configuration = $configuration + $this->defaultConfiguration();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSessionInitialized() {
+    return $this->sessionInitialized;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function resetSessionInitialized() {
+    $this->sessionInitialized = time();
   }
 
   /**
