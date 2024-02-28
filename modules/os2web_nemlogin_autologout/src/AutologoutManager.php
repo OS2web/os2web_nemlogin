@@ -18,6 +18,13 @@ class AutologoutManager implements AutologoutManagerInterface {
   use StringTranslationTrait;
 
   /**
+   * Limit for how long the session can live before it is forced to be destroyed.
+   *
+   * 8 hours = 28800 seconds.
+   */
+  const SESSION_TTL_SECONDS = 28800;
+
+  /**
    * The module manager service.
    *
    * @var \Drupal\Core\Extension\ModuleHandlerInterface
@@ -129,6 +136,8 @@ class AutologoutManager implements AutologoutManagerInterface {
     $plugin = $this->authProvider->getActivePlugin();
     if ($plugin->isAuthenticated()) {
       $plugin->clearValues();
+
+      $this->inactivityMessage();
     }
   }
 
@@ -137,9 +146,9 @@ class AutologoutManager implements AutologoutManagerInterface {
    */
   public function getRemainingTime() {
     $plugin = $this->authProvider->getActivePlugin();
-    $last_login = $plugin->getSessionInitialized();
+    $refreshed = $plugin->getSessionRefreshed();
 
-    $time_passed = ($last_login) ? $this->time->getRequestTime() - $last_login : 0;
+    $time_passed = ($refreshed) ? $this->time->getRequestTime() - $refreshed : 0;
 
     $timeout = $this->getUserTimeout();
     return $timeout - $time_passed;
@@ -148,9 +157,24 @@ class AutologoutManager implements AutologoutManagerInterface {
   /**
    * {@inheritdoc}
    */
+  public function canResetTime() {
+    $plugin = $this->authProvider->getActivePlugin();
+    $initialized = $plugin->getSessionInitialized();
+    $refreshed = $plugin->getSessionRefreshed();
+
+    if ($refreshed - $initialized < self::SESSION_TTL_SECONDS) {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function resetTime() {
     $plugin = $this->authProvider->getActivePlugin();
-    $plugin->resetSessionInitialized();
+    $plugin->refreshSessionTime();
   }
 
   /**

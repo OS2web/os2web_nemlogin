@@ -26,6 +26,14 @@ interface AutologoutManagerInterface {
   public function getRemainingTime();
 
   /**
+   * Check if the current session can be reset.
+   *
+   * @return boolean
+   *   TRUE - yes, FALSE - no.
+   */
+  public function canResetTime();
+
+  /**
    * Resets time to the current time value.
    */
   public function resetTime();

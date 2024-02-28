@@ -117,56 +117,6 @@ class AutologoutSubscriber implements EventSubscriberInterface {
   public function onRequest(RequestEvent $event) {
     $autologout_manager = $this->autoLogoutManager;
 
-    $uid = $this->currentUser->id();
-
-    if ($uid == 0) {
-      $autologout_timeout = $this->requestStack->getCurrentRequest()->query->get('autologout_timeout');
-      $post = $this->requestStack->getCurrentRequest()->request->all();
-      if (!empty($autologout_timeout) && $autologout_timeout == 1 && empty($post)) {
-        $autologout_manager->inactivityMessage();
-      }
-      return;
-    }
-
-    // If user is not anonymous.
-    if ($uid != 0) {
-      $session = $this->requestStack->getCurrentRequest()->getSession();
-      $auto_redirect = $session->get('auto_redirect');
-
-      // Get http referer.
-      $referer = "";
-      $request = $this->requestStack->getCurrentRequest();
-      if ($request->server->get('HTTP_REFERER')) {
-        $referer = $request->server->get('HTTP_REFERER');
-      }
-      // Get query string from http referer url.
-      $parse_url = parse_url($referer, PHP_URL_QUERY);
-      // If http referer url has 'destination' and session is not set,
-      // then only redirect to user page if uid dosen't match.
-      if ($parse_url !== NULL && (strpos($parse_url, 'destination') !== FALSE) && empty($auto_redirect)) {
-        parse_str($parse_url, $output);
-        $destination_uid = explode("/", $output['destination']);
-
-        // If array contains language code, remove it.
-        $languagecode = $this->languageManager->getCurrentLanguage()->getId();
-        if ($destination_uid[1] === $languagecode) {
-          unset($destination_uid[1]);
-          $destination_uid = array_values($destination_uid);
-        }
-
-        // If destination uid and actual uid does not match then,
-        // redirect to loggedin user page.
-        if (($destination_uid[1] == "user") && ($destination_uid[2] != $uid)) {
-          $auto_redirect = $session->set('auto_redirect', 1);
-          $login_url = Url::fromRoute('user.page', [], ['absolute' => TRUE])->toString();
-
-          // Redirect user to user page.
-          $response = new RedirectResponse($login_url);
-          $event->setResponse($response);
-        }
-      }
-    }
-
     if ($this->autoLogoutManager->preventJs()) {
       return;
     }
@@ -179,19 +129,12 @@ class AutologoutSubscriber implements EventSubscriberInterface {
 
     // We need a backup plan if JS is disabled.
     $plugin = $this->authProvider->getActivePlugin();
-    $last_login = $plugin->getSessionInitialized();
+    $last_login = $plugin->getSessionRefreshed();
     if ($last_login) {
       // If time since last access is > timeout + padding, log them out.
       $diff = $now - $last_login;
       if ($diff >= ($timeout + (int) $timeout_padding)) {
         $autologout_manager->logout();
-        // User has changed so force Drupal to remake decisions based on user.
-        global $theme, $theme_key;
-        drupal_static_reset();
-        $theme = NULL;
-        $theme_key = NULL;
-        $this->theme->getActiveTheme();
-        $autologout_manager->inactivityMessage();
       }
     }
   }

@@ -89,15 +89,22 @@ interface AuthProviderInterface extends PluginFormInterface, PluginInspectionInt
   public function clearValues();
 
   /**
-   * Returns when session was initialized (created or reset).
+   * Returns when session was initialized.
    *
    * @return int
    */
   public function getSessionInitialized();
 
-  /*
-   * Reset session initialized time.
+  /**
+   * Returns when session was refreshed.
+   *
+   * @return int
    */
-  public function resetSessionInitialized();
+  public function getSessionRefreshed();
+
+  /*
+   * Resets session refresh time.
+   */
+  public function refreshSessionTime();
 
 }

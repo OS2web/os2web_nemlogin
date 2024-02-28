@@ -22,7 +22,6 @@ class AutologoutController extends ControllerBase {
    */
   protected $autoLogoutManager;
 
-
   /**
    * The Time Service.
    *
@@ -71,12 +70,17 @@ class AutologoutController extends ControllerBase {
    * Ajax callback to reset the last access session variable.
    */
   public function ajaxSetLast() {
-    $this->autoLogoutManager->resetTime();
+    if ($this->autoLogoutManager->canResetTime()) {
+      $this->autoLogoutManager->resetTime();
 
-    // Reset the timer.
-    $response = new AjaxResponse();
-    $markup = $this->autoLogoutManager->createTimer();
-    $response->addCommand(new ReplaceCommand('#timer', $markup));
+      // Reset the timer.
+      $response = new AjaxResponse();
+      $markup = $this->autoLogoutManager->createTimer();
+      $response->addCommand(new ReplaceCommand('#timer', $markup));
+    }
+    else {
+      $response = $this->ajaxLogout();
+    }
 
     return $response;
   }

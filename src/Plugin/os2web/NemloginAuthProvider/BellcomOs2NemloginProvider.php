@@ -70,6 +70,11 @@ class BellcomOs2NemloginProvider extends AuthProviderBase {
     }
     $this->sessionInitialized = &$_SESSION['nemlogin_idp_init'];
 
+    if (!isset($_SESSION['nemlogin_idp_refresh'])) {
+      $_SESSION['nemlogin_idp_refresh'] = 0;
+    }
+    $this->sessionRefreshed = &$_SESSION['nemlogin_idp_refresh'];
+
     // Init authentication object.
     $this->httpClient = \Drupal::httpClient();
 
@@ -229,7 +234,8 @@ class BellcomOs2NemloginProvider extends AuthProviderBase {
         }
       }
 
-      $this->resetSessionInitialized();
+      $this->sessionInitialized = time();
+      $this->sessionRefreshed = time();
     }
 
     if (!$cpr && !$cvr) {
