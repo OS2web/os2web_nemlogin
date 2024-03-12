@@ -1,6 +1,7 @@
 enabled: true
-timeout: 1800
+timeout: 1620
 padding: 20
+session_ttl: 28800
 no_dialog: false
 message: 'Your session is about to expire. Do you want to reset it?'
 inactivity_message: 'You have been logged out due to inactivity.'

@@ -18,13 +18,6 @@ class AutologoutManager implements AutologoutManagerInterface {
   use StringTranslationTrait;
 
   /**
-   * Limit for how long the session can live before it is forced to be destroyed.
-   *
-   * 8 hours = 28800 seconds.
-   */
-  const SESSION_TTL_SECONDS = 28800;
-
-  /**
    * The module manager service.
    *
    * @var \Drupal\Core\Extension\ModuleHandlerInterface
@@ -161,8 +154,13 @@ class AutologoutManager implements AutologoutManagerInterface {
     $plugin = $this->authProvider->getActivePlugin();
     $initialized = $plugin->getSessionInitialized();
     $refreshed = $plugin->getSessionRefreshed();
+    $sessionTtl = $this->autoLogoutSettings->get('session_ttl');
+    if (!$sessionTtl) {
+      // Default value: 8 hours = 28800 seconds.
+      $sessionTtl = 28800;
+    }
 
-    if ($refreshed - $initialized < self::SESSION_TTL_SECONDS) {
+    if ($refreshed - $initialized < $sessionTtl) {
       return TRUE;
     }
 

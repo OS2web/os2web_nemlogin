@@ -89,7 +89,7 @@ class AutologoutSettingsForm extends ConfigFormBase {
     ];
 
     $form['timeout'] = [
-      '#type' => 'textfield',
+      '#type' => 'number',
       '#title' => $this->t('Timeout value in seconds'),
       '#default_value' => $config->get('timeout'),
       '#size' => 8,
@@ -98,12 +98,21 @@ class AutologoutSettingsForm extends ConfigFormBase {
     ];
 
     $form['padding'] = [
-      '#type' => 'textfield',
+      '#type' => 'number',
       '#title' => $this->t('Timeout padding'),
       '#default_value' => $config->get('padding'),
       '#size' => 8,
       '#weight' => -6,
       '#description' => $this->t('How many seconds to give a user to respond to the logout dialog before ending their session.'),
+    ];
+
+    $form['session_ttl'] = [
+      '#type' => 'number',
+      '#title' => $this->t('Maximum length of login (from first login)'),
+      '#default_value' => $config->get('session_ttl'),
+      '#size' => 8,
+      '#weight' => -6,
+      '#description' => $this->t('How many seconds to give can a session be prolonged for (will no be possible to extend it any longer)'),
     ];
 
     $form['no_dialog'] = [
@@ -230,6 +239,7 @@ class AutologoutSettingsForm extends ConfigFormBase {
       ->set('enabled', $values['enabled'])
       ->set('timeout', $values['timeout'])
       ->set('padding', $values['padding'])
+      ->set('session_ttl', $values['session_ttl'])
       ->set('no_dialog', $values['no_dialog'])
       ->set('dialog_title', $values['dialog_title'])
       ->set('message', $values['message'])
