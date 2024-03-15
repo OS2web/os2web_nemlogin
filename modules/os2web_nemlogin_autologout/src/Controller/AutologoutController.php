@@ -70,17 +70,12 @@ class AutologoutController extends ControllerBase {
    * Ajax callback to reset the last access session variable.
    */
   public function ajaxSetLast() {
-    if ($this->autoLogoutManager->canResetTime()) {
-      $this->autoLogoutManager->resetTime();
+    $this->autoLogoutManager->resetTime();
 
-      // Reset the timer.
-      $response = new AjaxResponse();
-      $markup = $this->autoLogoutManager->createTimer();
-      $response->addCommand(new ReplaceCommand('#timer', $markup));
-    }
-    else {
-      $response = $this->ajaxLogout();
-    }
+    // Reset the timer.
+    $response = new AjaxResponse();
+    $markup = $this->autoLogoutManager->createTimer();
+    $response->addCommand(new ReplaceCommand('#timer', $markup));
 
     return $response;
   }
@@ -95,8 +90,16 @@ class AutologoutController extends ControllerBase {
     // Reset the timer.
     $markup = $this->autoLogoutManager->createTimer();
 
-    $response->addCommand(new ReplaceCommand('#timer', $markup));
-    $response->addCommand(new SettingsCommand(['time' => $time_remaining_ms]));
+    if ($this->autoLogoutManager->canResetTime()) {
+      $response->addCommand(new ReplaceCommand('#timer', $markup));
+      $response->addCommand(new SettingsCommand(['time' => $time_remaining_ms, 'can_reset' => TRUE]));
+    }
+    else {
+      $response = $this->ajaxLogout();
+
+      $response->addCommand(new ReplaceCommand('#timer', $markup));
+      $response->addCommand(new SettingsCommand(['time' => 0, 'can_reset' => FALSE]));
+    }
 
     return $response;
   }

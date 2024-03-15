@@ -41,14 +41,14 @@
         // While the countdown timer is going, lookup the remaining time. If
         // there is more time remaining (i.e. a user is navigating in another
         // tab), then reset the timer for opening the dialog.
-        Drupal.Ajax['os2web_nemlogin_autologout.getTimeLeft'].autologoutGetTimeLeft(function (time) {
-          if (time > 0) {
+        Drupal.Ajax['os2web_nemlogin_autologout.getTimeLeft'].autologoutGetTimeLeft(function (time, can_reset) {
+          if (time > 0 && can_reset) {
             clearTimeout(paddingTimer);
             t = setTimeout(init, time);
           }
           else {
             // Logout user right away without displaying a confirmation dialog.
-            if (noDialog) {
+            if (noDialog || !can_reset) {
               logout();
               return;
             }
@@ -98,8 +98,8 @@
         } catch (exception){
         }
 
-        Drupal.Ajax['os2web_nemlogin_autologout.getTimeLeft'].autologoutGetTimeLeft(function (time) {
-          if (time > 0) {
+        Drupal.Ajax['os2web_nemlogin_autologout.getTimeLeft'].autologoutGetTimeLeft(function (time, can_reset) {
+          if (time > 0 && can_reset) {
             t = setTimeout(init, time);
           }
           else {
@@ -149,7 +149,7 @@
        * Use the Drupal ajax library to handle get time remaining events
        * because if using the JS Timer, the return will update it.
        *
-       * @param function callback(time)
+       * @param function callback(time, can_reset)
        *   The function to run when ajax is successful. The time parameter
        *   is the time remaining for the current user in ms.
        */
@@ -165,7 +165,7 @@
             window.location.reload();
           }
 
-          callback(response[1].settings.time);
+          callback(response[1].settings.time, response[1].settings.can_reset);
 
           response[0].data = '<div id="timer" style="display: none;">' + response[0].data + '</div>';
 
