@@ -169,6 +169,8 @@
 
           response[0].data = '<div id="timer" style="display: none;">' + response[0].data + '</div>';
 
+          ajax.ajaxing = false;
+
           // Let Drupal.ajax handle the JSON response.
           return ajax.success(response, status);
         };
@@ -223,6 +225,8 @@
 
           // Wrap response data in timer markup to prevent detach of all behaviors.
           response[0].data = '<div id="timer" style="display: none;">' + response[0].data + '</div>';
+
+          ajax.ajaxing = false;
 
           // Let Drupal.ajax handle the JSON response.
           return ajax.success(response, status);
