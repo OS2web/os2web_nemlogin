@@ -153,14 +153,13 @@ class AutologoutManager implements AutologoutManagerInterface {
   public function canResetTime() {
     $plugin = $this->authProvider->getActivePlugin();
     $initialized = $plugin->getSessionInitialized();
-    $refreshed = $plugin->getSessionRefreshed();
     $sessionTtl = $this->autoLogoutSettings->get('session_ttl');
     if (!$sessionTtl) {
       // Default value: 8 hours = 28800 seconds.
       $sessionTtl = 28800;
     }
 
-    if ($refreshed - $initialized < $sessionTtl) {
+    if (time() - $initialized < $sessionTtl) {
       return TRUE;
     }
 
