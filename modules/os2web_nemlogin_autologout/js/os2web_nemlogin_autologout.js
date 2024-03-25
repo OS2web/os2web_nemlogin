@@ -133,11 +133,11 @@
             var logoutUrl = window.location.href;
             triggerLogoutEvent('normal', logoutUrl);
 
-            window.location.reload();
+            window.location.href = drupalSettings.path.baseUrl;
           },
           error: function (XMLHttpRequest, textStatus) {
             if (XMLHttpRequest.status === 403 || XMLHttpRequest.status === 404) {
-              window.location.reload();
+              window.location.href = drupalSettings.path.baseUrl;
             }
           }
         });
@@ -162,7 +162,7 @@
           }
           if (typeof response[0].command === 'string' && response[0].command === 'alert') {
             // In the event of an error, we can assume user has been logged out.
-            window.location.reload();
+            window.location.href = drupalSettings.path.baseUrl;
           }
 
           callback(response[1].settings.time, response[1].settings.can_reset);
@@ -192,7 +192,6 @@
         // },
         event: 'os2web_nemlogin_autologout.getTimeLeft',
         error: function (XMLHttpRequest, textStatus) {
-          // Disable error reporting to the screen.
         },
       });
 
@@ -218,7 +217,7 @@
           }
           if (typeof response[0].command === 'string' && response[0].command === 'alert') {
             // In the event of an error, we can assume the user has been logged out.
-            window.location.reload();
+            window.location.href = drupalSettings.path.baseUrl;
           }
 
           t = setTimeout(timerfunction, localSettings.timeout);
