@@ -133,11 +133,11 @@
             var logoutUrl = window.location.href;
             triggerLogoutEvent('normal', logoutUrl);
 
-            window.location.href = drupalSettings.path.baseUrl;
+            window.location.href = window.location.href
           },
           error: function (XMLHttpRequest, textStatus) {
             if (XMLHttpRequest.status === 403 || XMLHttpRequest.status === 404) {
-              window.location.href = drupalSettings.path.baseUrl;
+              window.location.href = window.location.href
             }
           }
         });
@@ -162,7 +162,7 @@
           }
           if (typeof response[0].command === 'string' && response[0].command === 'alert') {
             // In the event of an error, we can assume user has been logged out.
-            window.location.href = drupalSettings.path.baseUrl;
+            window.location.href = window.location.href
           }
 
           callback(response[1].settings.time, response[1].settings.can_reset);
@@ -217,7 +217,7 @@
           }
           if (typeof response[0].command === 'string' && response[0].command === 'alert') {
             // In the event of an error, we can assume the user has been logged out.
-            window.location.href = drupalSettings.path.baseUrl;
+            window.location.href = window.location.href
           }
 
           t = setTimeout(timerfunction, localSettings.timeout);
