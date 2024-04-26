@@ -4,5 +4,14 @@
     "description": "Provide authentication via Nemlogin",
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "license": "EUPL-1.2"
+    "license": "EUPL-1.2",
+    "repositories": {
+        "os2": {
+            "type": "path",
+            "url": "/var/www/develop/*",
+            "options": {
+                "symlink": false
+            }
+        }
+    }
 }
