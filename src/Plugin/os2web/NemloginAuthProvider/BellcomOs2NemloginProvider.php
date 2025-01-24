@@ -205,7 +205,7 @@ class BellcomOs2NemloginProvider extends AuthProviderBase {
       if (isset($response->cpr)) {
         $cprraw = $response->cpr;
         if ($cprraw) {
-          $cpr = utf8_decode($cprraw);
+          $cpr = mb_convert_encoding($cprraw, 'ISO-8859-1');
           $this->values['cpr'] = $cpr;
         }
       }
@@ -213,7 +213,7 @@ class BellcomOs2NemloginProvider extends AuthProviderBase {
       if (isset($response->pid)) {
         $pidraw = $response->pid;
         if ($pidraw) {
-          $pid = utf8_decode($pidraw);
+          $pid = mb_convert_encoding($pidraw, 'ISO-8859-1');
           $this->values['pid'] = $pid;
         }
       }
@@ -221,7 +221,7 @@ class BellcomOs2NemloginProvider extends AuthProviderBase {
       if (isset($response->cvr)) {
         $cvrraw = $response->cvr;
         if ($cvrraw) {
-          $cvr = utf8_decode($cvrraw);
+          $cvr = mb_convert_encoding($cvrraw, 'ISO-8859-1');
           $this->values['cvr'] = $cvr;
         }
       }
@@ -229,7 +229,7 @@ class BellcomOs2NemloginProvider extends AuthProviderBase {
       if (isset($response->rid)) {
         $ridraw = $response->rid;
         if ($ridraw) {
-          $rid = utf8_decode($ridraw);
+          $rid = mb_convert_encoding($ridraw, 'ISO-8859-1');
           $this->values['rid'] = $rid;
         }
       }
