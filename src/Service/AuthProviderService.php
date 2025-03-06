@@ -6,6 +6,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\os2web_nemlogin\Form\SettingsForm;
+use Drupal\os2web_nemlogin\Plugin\AuthProviderInterface;
 
 /**
  * Class AuthProviderService.
@@ -22,6 +23,13 @@ class AuthProviderService {
   protected $config;
 
   /**
+   * Active plugin.
+   *
+   * @var \Drupal\os2web_nemlogin\Plugin\AuthProviderInterface
+   */
+  protected AuthProviderInterface $activePlugin;
+
+  /**
    * AuthProviderService constructor.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
@@ -29,6 +37,7 @@ class AuthProviderService {
    */
   public function __construct(ConfigFactoryInterface $config_factory) {
     $this->config = $config_factory->get(SettingsForm::$configName);
+    $this->activePlugin = $this->getPluginInstance($this->getActivePluginId());
   }
 
   /**
@@ -50,7 +59,7 @@ class AuthProviderService {
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   public function getActivePlugin() {
-    return $this->getPluginInstance($this->getActivePluginId());
+    return $this->activePlugin;
   }
 
   /**
