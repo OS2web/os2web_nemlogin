@@ -79,8 +79,7 @@ class BellcomOs2NemloginProvider extends AuthProviderBase {
     $this->httpClient = \Drupal::httpClient();
 
     $url_to_test = [
-      $this->idpUrl . OS2WEB_NEMLOGIN_BEL_OS2_REST_PATH,
-      $this->idpUrl . OS2WEB_NEMLOGIN_BEL_OS2_LOGIN_PATH,
+      $this->idpUrl . OS2WEB_NEMLOGIN_BEL_OS2_REST_PATH
     ];
 
     // Testing if we have access to all URLs.
@@ -101,8 +100,7 @@ class BellcomOs2NemloginProvider extends AuthProviderBase {
    */
   public function isInitialized() {
     $url_to_test = [
-      $this->idpUrl . OS2WEB_NEMLOGIN_BEL_OS2_REST_PATH,
-      $this->idpUrl . OS2WEB_NEMLOGIN_BEL_OS2_LOGIN_PATH,
+      $this->idpUrl . OS2WEB_NEMLOGIN_BEL_OS2_REST_PATH
     ];
 
     // Testing if we have access to all URLs.
