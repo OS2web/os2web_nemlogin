@@ -28,21 +28,21 @@ class Idp extends AuthProviderBase {
    *
    * @var string
    */
-  private $idpUrl;
+  protected $idpUrl;
 
   /**
    * Fetch only mode flag.
    *
    * @var bool
    */
-  private $fetchOnce;
+  protected $fetchOnce;
 
   /**
    * Authorization object.
    *
    * @var SoapClient
    */
-  private $soapClient;
+  protected $soapClient;
 
   /**
    * {@inheritdoc}
@@ -161,7 +161,7 @@ class Idp extends AuthProviderBase {
       if (isset($response->LogInResult->cpr)) {
         $cprraw = $response->LogInResult->cpr;
         if ($cprraw) {
-          $cpr = utf8_decode($cprraw);
+          $cpr = mb_convert_encoding($cprraw, 'ISO-8859-1', 'UTF-8');
           $this->values['cpr'] = $cpr;
         }
       }
@@ -169,7 +169,7 @@ class Idp extends AuthProviderBase {
       if (isset($response->LogInResult->pid)) {
         $pidraw = $response->LogInResult->pid;
         if ($pidraw) {
-          $pid = utf8_decode($pidraw);
+          $pid = mb_convert_encoding($pidraw, 'ISO-8859-1', 'UTF-8');
           $this->values['pid'] = $pid;
         }
       }
@@ -177,7 +177,7 @@ class Idp extends AuthProviderBase {
       if (isset($response->LogInResult->cvr)) {
         $cvrraw = $response->LogInResult->cvr;
         if ($cvrraw) {
-          $cvr = utf8_decode($cvrraw);
+          $cvr = mb_convert_encoding($cvrraw, 'ISO-8859-1', 'UTF-8');
           $this->values['cvr'] = $cvr;
         }
       }
@@ -185,7 +185,7 @@ class Idp extends AuthProviderBase {
       if (isset($response->LogInResult->rid)) {
         $ridraw = $response->LogInResult->rid;
         if ($ridraw) {
-          $rid = utf8_decode($ridraw);
+          $rid = mb_convert_encoding($ridraw, 'ISO-8859-1', 'UTF-8');
           $this->values['rid'] = $rid;
         }
       }

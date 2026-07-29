@@ -18,8 +18,7 @@ class AuthProviderRoutes implements ContainerInjectionInterface {
    * @param \Drupal\Component\Plugin\PluginManagerInterface $authProviderManager
    *   The AuthProviderManager.
    */
-  public function __construct(PluginManagerInterface $authProviderManager) {
-    $this->authProviderManager = $authProviderManager;
+  public function __construct(protected PluginManagerInterface $authProviderManager) {
   }
 
   /**

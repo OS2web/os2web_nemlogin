@@ -6,6 +6,7 @@ use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Url;
+use Drupal\node\Entity\Node;
 use Drupal\os2web_nemlogin\Plugin\AuthProviderBase;
 use GuzzleHttp\Exception\ServerException;
 
@@ -29,21 +30,21 @@ class BellcomOs2NemloginProvider extends AuthProviderBase {
    *
    * @var string
    */
-  private $idpUrl;
+  protected $idpUrl;
 
   /**
    * Fetch only mode flag.
    *
    * @var bool
    */
-  private $fetchOnce;
+  protected $fetchOnce;
 
   /**
    * Authorization object.
    *
    * @var \GuzzleHttp\Client
    */
-  private $httpClient;
+  protected $httpClient;
 
   /**
    * {@inheritdoc}

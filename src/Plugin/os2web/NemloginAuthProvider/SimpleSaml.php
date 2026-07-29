@@ -25,7 +25,7 @@ class SimpleSaml extends AuthProviderBase {
    *
    * @var SimpleSAML_Auth_Simple
    */
-  private $as;
+  protected $as;
 
   /**
    * SimpleSaml constructor.
