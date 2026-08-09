@@ -13,6 +13,13 @@ use Symfony\Component\Routing\Route;
 class AuthProviderRoutes implements ContainerInjectionInterface {
 
   /**
+   * The AuthProviderManager.
+   *
+   * @var \Drupal\Component\Plugin\PluginManagerInterface
+   */
+  protected $authProviderManager;
+
+  /**
    * Constructs a new AuthProvider route subscriber.
    *
    * @param \Drupal\Component\Plugin\PluginManagerInterface $authProviderManager
